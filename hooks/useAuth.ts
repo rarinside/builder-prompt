@@ -1,8 +1,7 @@
 
 "use client"
 
-import React, { type ReactNode } from "react"
-import { createContext, useContext, useEffect, useState } from "react"
+import React, { type ReactNode, createContext, useContext, useEffect, useState } from "react"
 import { createClient } from "@/lib/supabase/client"
 import type { User } from "@supabase/supabase-js"
 import { useRouter } from "next/navigation"
@@ -88,7 +87,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       console.log("AuthProvider: Sign in successful:", data.user?.email)
-      // O redirecionamento será feito pelo onAuthStateChange
       return { data, error: null }
     } catch (error) {
       console.error("AuthProvider: Sign in error:", error)
@@ -120,7 +118,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return { data: null, error: { message: result.error || "Erro ao criar conta" } }
       }
 
-      // Fazer login automaticamente após registro bem-sucedido
       console.log("AuthProvider: Registration successful, attempting auto-login...")
       const loginResult = await signIn(email, password)
 
@@ -147,7 +144,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  const value = {
+  const contextValue: AuthContextType = {
     user,
     loading,
     signIn,
@@ -155,10 +152,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     signOut,
   }
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
+  return React.createElement(
+    AuthContext.Provider,
+    { value: contextValue },
+    children
   )
 }
 
